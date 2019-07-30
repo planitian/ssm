@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!--内部的标签 每个种类标签 只能有一个-->
+<configuration>
+    <!--引用外部的java配置文件,同时这里 还自己添加了自定义元素-->
+    <properties resource="jdbc.properties">
+        <property name="username" value="dev_user"/>
+        <property name="password" value="F2Fa3!33TYyg"/>
+    </properties>
+    <!--改变 MyBatis 的运行时行为-->
+    <settings>
+        <setting name="defaultStatementTimeout" value="2"/>
+            <!-- 打印查询语句 -->
+            <setting name="logImpl" value="STDOUT_LOGGING" />
+    </settings>
+    <!-- 配置别名 -->
+    <typeAliases>
+        <!--将User类 设置别名  user-->
+        <typeAlias type="com.plani.model.User" alias="user"/>
+
+        <!-- 批量扫描别名 -->
+        <package name="com.plani.model"/>
+    </typeAliases>
+
+  <!--  <typeHandlers>
+        &lt;!&ndash;配置类型处理器，映射的类型 既可以在下面这个类上加@MappedJdbcTypes(JdbcType.VARCHAR)，也可以在标签里面增加子标签&ndash;&gt;
+        <typeHandler handler="org.mybatis.example.ExampleTypeHandler" javaType="String" jdbcType="CHAR, VARCHAR"/>
+
+        &lt;!&ndash;MyBatis 为你查找类型处理器&ndash;&gt;
+        <package name="com.plani.model"/>
+    </typeHandlers>-->
+
+
+<!--    &lt;!&ndash;定义自己的对象工厂， 默认的对象工厂需要做的仅仅是实例化目标类，要么通过默认构造方法，要么在参数映射存在的时候通过参数构造方法来实例化。&ndash;&gt;
+    <objectFactory type="org.mybatis.example.ExampleObjectFactory">
+        <property name="someProperty" value="100"/>
+    </objectFactory>-->
+
+  <!--  &lt;!&ndash;插件 &ndash;&gt;
+    <plugins>
+        <plugin interceptor="org.mybatis.example.ExamplePlugin">
+            <property name="someProperty" value="100"/>
+        </plugin>
+    </plugins>-->
+
+    <!--
+    每个数据库对应一个 SqlSessionFactory 实例
+    保证默认环境要匹配其中一个环境ID 就是default=“” 要对应 它子元素其中一个的id
+    -->
+    <environments default="development">
+        <environment id="development">
+            <!--配置事务  MyBatis 中有两种类型的事务管理器（也就是 type="[JDBC|MANAGED]"）-->
+            <transactionManager type="MANAGED">
+                <property name="closeConnection" value="false"/>
+            </transactionManager>
+
+            <!-- type="[UNPOOLED|POOLED|JNDI]"
+            UNPOOLED– 这个数据源的实现只是每次被请求时打开和关闭连接。
+            POOLED– 这种数据源的实现利用"池"的概念将 JDBC 连接对象组织起来，避免了创建新的连接实例时所必需的初始化和认证时间。 这是一种使得并发 Web 应用快速响应请求的流行处理方式
+            NDI– 这个数据源的实现是为了能在如 EJB 或应用服务器这类容器中使用，容器可以集中或在外部配置数据源，然后放置一个 JNDI 上下文的引用。
+            -->
+            <dataSource type="POOLED">
+                <property name="driver" value="${jdbc.driverClassName}"/>
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!--根据不同的数据库厂商执行不同的语句-->
+    <databaseIdProvider type="DB_VENDOR">
+        <property name="SQL Server" value="sqlserver"/>
+        <property name="DB2" value="db2"/>
+        <property name="Oracle" value="oracle"/>
+    </databaseIdProvider>
+    <!--映射sql语句-->
+    <mappers>
+        <mapper resource="mapper/UserMapper.xml"/>
+        <!--<package name="org.mybatis.builder"/>-->
+    </mappers>
+</configuration>
+
+

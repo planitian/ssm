@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+
+           http://www.springframework.org/schema/mvc
+           http://www.springframework.org/schema/mvc/spring-mvc.xsd
+
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--扫描controller 文件下面的-->
+    <context:component-scan base-package="com.plani.controller "/>
+
+    <!--设置匹配方案  扩充注解驱动 可以将请求参数绑定到控制器参数 -->
+    <mvc:annotation-driven>
+        <!--json支持-->
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!-- 2、静态资源请求默认servlet处理(如：js、gif等等，允许web.xml中使用“/”做为整体映射) -->
+    <mvc:default-servlet-handler/>
+
+   <!--配置ViewResolver ,可以用多个ViewResolver，使用order属性排序，-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="suffix" value=".html"/>
+    </bean>
+
+    <!--AOP-->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+
+</beans>

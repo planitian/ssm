@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+
+          http://www.springframework.org/schema/context
+          http://www.springframework.org/schema/context/spring-context-3.0.xsd
+
+          http://www.springframework.org/schema/aop
+          http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+
+          http://www.springframework.org/schema/mvc
+          http://www.springframework.org/schema/mvc/spring-mvc.xsd
+
+          http://www.springframework.org/schema/tx
+          http://www.springframework.org/schema/tx/spring-tx.xsd ">
+
+
+    <!--配置数据库相关参数,这样 可以在本页面使用jdbc.properties里面的值-->
+    <context:property-placeholder location="classpath:jdbc.properties" ignore-unresolvable="true"/>
+
+    <!--数据源 druid-->
+    <bean id="dataSourceOne" class="com.alibaba.druid.pool.DruidDataSource"
+          init-method="init" destroy-method="clone">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="maxWait" value="${jdbc.maxWait}"/>
+        <property name="minIdle" value="${jdbc.minIdle}"/>
+        <property name="maxActive" value="${jdbc.maxActive}"/>
+        <property name="initialSize" value="${jdbc.initialSize}"/>
+        <property name="defaultAutoCommit" value="false"/>
+    </bean>
+    <!--使用注解来配置依赖注入-->
+    <context:annotation-config/>
+
+    <!--使用了 这个 就不需要配置mybatis文件了，配置SqlSessionFactory对象-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--注入数据库连接池-->
+        <property name="dataSource" ref="dataSourceOne"/>
+
+        <!--扫描sql配置文件 mapper 需要的xml文件-->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+        <!-- 加载mybatis的全局配置文件 -->
+        <!--<property name="configLocation" value="classpath:sqlMapConfig.xml"/>-->
+
+    </bean>
+    <!--扫描basePackage 下所有以@MyBatisDao 注解的接口-->
+    <bean id="mapperScannerConfiguer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--注入sqlSessionFactory-->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!--需要扫描dao接口包-->
+        <property name="basePackage" value="com.plani.dao"/>
+    </bean>
+
+
+    <context:component-scan base-package="com.plani"/>
+    <!--<context:component-scan base-package="com.plani.bean"/>-->
+
+    <!--声明事务-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSourceOne"/>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+    <!--在所有bean init前后加切面-->
+    <!--<bean id="initBean" class="com.plani.bean.InitBean"/>-->
+
+    <!--构造注入-->
+    <bean id="one" class="com.plani.model.One" autowire="byName">
+        <!--<constructor-arg name="name" value="我是spring构造注入的"/>-->
+        <property name="name" value="setter注入"/>
+    </bean>
+
+    <bean id="two" class="com.plani.model.Two">
+        <property name="name" value="子类注入"/>
+    </bean>
+
+    <bean id="user" class="com.plani.model.User">
+        <property name="name" value="构造注入"/>
+    </bean>
+
+
+</beans>
